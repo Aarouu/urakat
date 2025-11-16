@@ -10,3 +10,24 @@ Ihmiset voivat postata alustalle urakkahommia, jotka tulisi toteuttaa esim. katt
 * Sovelluksessa on käyttäjäsivut, jotka näyttävät tilastoja käyttäjien historiasta .
 * Käyttäjä pystyy valitsemaan urakan ilmoitukselle milloin, millä hinnalla, missä paikassa ja kuinka nopeasti tulisi saada valmiiksi.
 * Käyttäjä pystyy tarjoutua tekemään toisten postaaman urakan omalla hinnalla ja ehdoillaan.
+
+## Sovelluksen asennus
+
+Asenna `flask`-kirjasto:
+
+```
+$ pip install flask
+```
+
+Luo tietokannan taulut ja lisää alkutiedot:
+
+```
+$ sqlite3 database.db < schema.sql
+$ sqlite3 database.db < init.sql
+```
+
+Voit käynnistää sovelluksen näin:
+
+```
+$ flask run
+```
