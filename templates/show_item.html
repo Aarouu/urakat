@@ -6,16 +6,26 @@
 </head>
 
 <body>
-  <h1> {{ item.title }}</h1>
+  <h1>{{ item.title }}</h1>
+
   <p>
     {{ item.description }}
   </p>
+
   <p>
     Lähtöhinta: {{ item.start_price }} €
   </p>
-  <p>
-    Ilmoittaja: {{item.username}}
-  </p>
-</body>
 
+  <p>
+    Ilmoittaja: {{ item.username }}
+  </p>
+
+  {% if session.username == item.username %}
+  <p>
+    <a href="/item/{{ item.id }}/edit">Muokkaa ilmoitusta</a>
+  </p>
+  {% endif %}
+
+</body>
 </html>
+  

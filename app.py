@@ -82,3 +82,31 @@ def logout():
     del session["user_id"]
     del session["username"]
     return redirect("/")
+
+@app.route("/item/<int:item_id>/edit", methods=["GET", "POST"])
+def edit_item(item_id):
+    # Check if user is logged in
+    if "user_id" not in session:
+        return redirect("/login")
+
+    # Get the current item
+    item = items.get_item(item_id)
+    if not item:
+        return "VIRHE: Ilmoitusta ei löydy"
+
+    # Make sure the logged-in user is the owner
+    user_id = session["user_id"]
+    if item["username"] != session["username"]:
+        return "VIRHE: Sinulla ei ole oikeuksia muokata tätä ilmoitusta"
+
+    # If user submitted the form
+    if request.method == "POST":
+        new_title = request.form["title"]
+        new_description = request.form["description"]
+        new_price = request.form["start_price"]
+
+        items.update_item(item_id, new_title, new_description, new_price)
+        return redirect(f"/item/{item_id}")
+
+    # Otherwise show the edit form
+    return render_template("edit_item.html", item=item)
