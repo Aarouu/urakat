@@ -17,7 +17,11 @@ def index():
 @app.route("/item/<int:item_id>")
 def show_item(item_id):
     item = items.get_item(item_id)
+    print(f"Retrieved Item: {item}")  # Debugging line
+    if not item:
+        return "VIRHE: Ilmoitusta ei löydy"
     return render_template("show_item.html", item=item)
+
 
 
 @app.route("/new_item")
@@ -110,3 +114,4 @@ def edit_item(item_id):
 
     # Otherwise show the edit form
     return render_template("edit_item.html", item=item)
+

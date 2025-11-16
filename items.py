@@ -13,7 +13,8 @@ def get_items():
 
 def get_item(item_id):
     # Return a single item with the creator's username
-    sql = """SELECT items.title,
+    sql = """SELECT items.id,  -- Ensure you're selecting the id
+                    items.title,
                     items.description,
                     items.start_price,
                     users.username
@@ -28,3 +29,4 @@ def update_item(item_id, title, description, start_price):
              SET title = ?, description = ?, start_price = ?
              WHERE id = ?"""
     db.execute(sql, [title, description, start_price, item_id])
+
