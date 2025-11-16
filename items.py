@@ -5,10 +5,15 @@ def add_item(title, description, start_price, user_id):
              VALUES (?, ?, ?, ?)"""
     db.execute(sql, [title, description, start_price, user_id])
 
-def get_items():
-    # Return all items, newest first
-    sql = "SELECT id, title FROM items ORDER BY id DESC"
-    return db.query(sql)
+def get_items(search_query=None):
+    # Return all items, newest first, filtered by search query
+    if search_query:
+        sql = "SELECT id, title FROM items WHERE title LIKE ? ORDER BY id DESC"
+        return db.query(sql, ['%' + search_query + '%'])
+    else:
+        sql = "SELECT id, title FROM items ORDER BY id DESC"
+        return db.query(sql)
+
 
 
 def get_item(item_id):

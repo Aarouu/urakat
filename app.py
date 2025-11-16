@@ -9,10 +9,12 @@ import items
 app = Flask(__name__)
 app.secret_key = config.secret_key
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    all_items = items.get_items()
-    return render_template("index.html", items=all_items)
+    search_query = request.form.get("search_query", "") if request.method == "POST" else ""
+    all_items = items.get_items(search_query)
+    return render_template("index.html", items=all_items, search_query=search_query)
+
 
 @app.route("/item/<int:item_id>")
 def show_item(item_id):
