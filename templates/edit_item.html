@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8" />
   <title>Muokkaa ilmoitusta</title>
 </head>
 <body>
   <h1>Muokkaa ilmoitusta</h1>
+
   <form action="/item/{{ item.id }}/edit" method="post">
     <p>
       Otsikko: <br />
@@ -20,6 +22,16 @@
     </p>
     <input type="submit" value="Tallenna muutokset" />
   </form>
+
+  <!-- Owner-only delete button -->
+  {% if session.get('user_id') and session.get('user_id') == item.user_id %}
+  <hr />
+  <form action="/item/{{ item.id }}/delete" method="post" onsubmit="return confirm('Haluatko varmasti poistaa tämän ilmoituksen? Tätä toimintoa ei voi peruuttaa.');">
+    <button type="submit" style="background-color:#c00;color:#fff;border:none;padding:8px 12px;cursor:pointer;">
+      Poista ilmoitus
+    </button>
+  </form>
+  {% endif %}
 
   <p><a href="/item/{{ item.id }}">Peruuta</a></p>
 </body>

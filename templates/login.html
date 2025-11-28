@@ -1,31 +1,50 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+  <meta charset="utf-8" />
   <title>Kirjautuminen</title>
+  <style>
+    /* Kevyt tyyli flash-viesteille */
+    .flashes { margin: 1em 0; padding: 0; }
+    .flashes ul { margin: 0; padding-left: 0; list-style: none; }
+    .flashes li { color: green; margin: 0.25em 0; }
+    .error { color: #c00; }
+  </style>
 </head>
-
 <body>
-  {% if session.username %}
-  <p>
-    Olet kirjautunut nimellä {{ session.username }}
-  </p>
-  <p>
-    <a href="/logout">Kirjaudu ulos</a>
-  </p>
-  {% else %}
-  <form action="/login" method="post">
-    <p>
-      Tunnus: <br />
-      <input type="text" name="username" />
-    </p>
-    <p>
-      Salasana: <br />
-      <input type="password" name="password" />
-    </p>
-    <input type="submit" value="Kirjaudu" />
-  </form>
-  {% endif %}
-</body>
 
+  <!-- Flash-viestit -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flashes">
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% if session.username %}
+    <p>Olet kirjautunut nimellä {{ session.username }}</p>
+    <p><a href="/logout">Kirjaudu ulos</a></p>
+  {% else %}
+    <h1>Kirjaudu</h1>
+    <form action="/login" method="post">
+      <p>
+        Tunnus: <br />
+        <input type="text" name="username" />
+      </p>
+      <p>
+        Salasana: <br />
+        <input type="password" name="password" />
+      </p>
+      <input type="submit" value="Kirjaudu" />
+    </form>
+
+    <p>Ei vielä tunnusta? <a href="/register">Luo tunnus</a></p>
+  {% endif %}
+
+</body>
 </html>

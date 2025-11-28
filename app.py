@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask
-from flask import redirect, render_template, request, session
+from flask import redirect, render_template, request, session, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 import db
 import config
@@ -47,7 +47,7 @@ def register():
 
 @app.route("/create", methods=["POST"])
 def create():
-    username = request.form["username"]
+    username = request.form["username"].strip()
     password1 = request.form["password1"]
     password2 = request.form["password2"]
     if password1 != password2:
@@ -60,28 +60,37 @@ def create():
     except sqlite3.IntegrityError:
         return "VIRHE: tunnus on jo varattu"
 
-    return "Tunnus luotu"
+    # Show a message on the login page (ensure login.html renders flashed messages)
+    flash("Tunnus luotu. Kirjaudu sisään.")
+    return redirect("/login")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
         return render_template("login.html")
 
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+    username = request.form["username"].strip()
+    password = request.form["password"]
 
-        sql = "SELECT id, password_hash FROM users WHERE username = ?"
-        result = db.query(sql, [username])[0]
-        user_id = result["id"]
-        password_hash = result["password_hash"]
+    sql = "SELECT id, password_hash FROM users WHERE username = ?"
+    rows = db.query(sql, [username])
 
-        if check_password_hash(password_hash, password):
-            session["user_id"] = user_id
-            session["username"] = username
-            return redirect("/")
-        else:
-            return "VIRHE: väärä tunnus tai salasana"
+    if not rows:
+        flash("VIRHE: väärä tunnus tai salasana")
+        return redirect("/login")
+
+    result = rows[0]
+    user_id = result["id"]
+    password_hash = result["password_hash"]
+
+    if check_password_hash(password_hash, password):
+        session["user_id"] = user_id
+        session["username"] = username
+        return redirect("/")
+    else:
+        flash("VIRHE: väärä tunnus tai salasana")
+        return redirect("/login")
+    
 
 @app.route("/logout")
 def logout():
@@ -89,23 +98,23 @@ def logout():
     del session["username"]
     return redirect("/")
 
+# app.py
 @app.route("/item/<int:item_id>/edit", methods=["GET", "POST"])
 def edit_item(item_id):
-    # Check if user is logged in
+    # Require login
     if "user_id" not in session:
         return redirect("/login")
 
-    # Get the current item
+    # Fetch the item
     item = items.get_item(item_id)
     if not item:
         return "VIRHE: Ilmoitusta ei löydy"
 
-    # Make sure the logged-in user is the owner
-    user_id = session["user_id"]
-    if item["username"] != session["username"]:
+    # Ownership check using user_id
+    if item["user_id"] != session["user_id"]:
         return "VIRHE: Sinulla ei ole oikeuksia muokata tätä ilmoitusta"
 
-    # If user submitted the form
+    # Handle form submission
     if request.method == "POST":
         new_title = request.form["title"]
         new_description = request.form["description"]
@@ -114,6 +123,24 @@ def edit_item(item_id):
         items.update_item(item_id, new_title, new_description, new_price)
         return redirect(f"/item/{item_id}")
 
-    # Otherwise show the edit form
+    # Render the edit form
     return render_template("edit_item.html", item=item)
 
+@app.route("/item/<int:item_id>/delete", methods=["POST"])
+def delete_item(item_id):
+    # Varmista kirjautuminen
+    if "user_id" not in session:
+        return redirect("/login")
+
+    # Hae ilmoitus
+    item = items.get_item(item_id)
+    if not item:
+        return "VIRHE: Ilmoitusta ei löydy"
+
+    # Omistajuuden tarkistus
+    if item["user_id"] != session["user_id"]:
+        return "VIRHE: Sinulla ei ole oikeuksia poistaa tätä ilmoitusta"
+
+    # Poista ilmoitus ja ohjaa etusivulle
+    items.delete_item(item_id)
+    return redirect("/")
