@@ -1,26 +1,47 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+  <meta charset="utf-8" />
   <title>Rekisteröinti</title>
+  <style>
+    .flashes ul { margin: 1em 0; padding-left: 0; list-style: none; color: #c00; }
+  </style>
 </head>
-
 <body>
-  <form action="/create" method="post">
+  <!-- Show flash messages (e.g., validation errors) -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flashes">
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <h1>Luo tunnus</h1>
+  <form action="/create" method="post" novalidate>
     <p>
       Tunnus: <br />
-      <input type="text" name="username" />
+      <input type="text" name="username"
+             required minlength="3" maxlength="30"
+             pattern="[A-Za-z0-9_-]+" />
     </p>
     <p>
       Salasana: <br />
-      <input type="password" name="password1" />
+      <input type="password" name="password1"
+             required minlength="8" />
     </p>
     <p>
       Salasana uudestaan: <br />
-      <input type="password" name="password2" />
+      <input type="password" name="password2"
+             required minlength="8" />
     </p>
     <input type="submit" value="Luo tunnus" />
   </form>
-</body>
 
+  <p>Onko sinulla jo tunnus? <a href="/login">Kirjaudu sisään</a></p>
+</body>
 </html>

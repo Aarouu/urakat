@@ -4,16 +4,13 @@
   <meta charset="utf-8" />
   <title>Kirjautuminen</title>
   <style>
-    /* Kevyt tyyli flash-viesteille */
-    .flashes { margin: 1em 0; padding: 0; }
-    .flashes ul { margin: 0; padding-left: 0; list-style: none; }
-    .flashes li { color: green; margin: 0.25em 0; }
-    .error { color: #c00; }
+    .flashes ul { margin: 1em 0; padding-left: 0; list-style: none; color: #c00; }
+    .success ul { color: green; }
   </style>
 </head>
 <body>
 
-  <!-- Flash-viestit -->
+  <!-- Flash messages (e.g., “Tunnus luotu. Kirjaudu sisään.” or login errors) -->
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       <div class="flashes">
@@ -31,14 +28,14 @@
     <p><a href="/logout">Kirjaudu ulos</a></p>
   {% else %}
     <h1>Kirjaudu</h1>
-    <form action="/login" method="post">
+    <form action="/login" method="post" novalidate>
       <p>
         Tunnus: <br />
-        <input type="text" name="username" />
+        <input type="text" name="username" required />
       </p>
       <p>
         Salasana: <br />
-        <input type="password" name="password" />
+        <input type="password" name="password" required />
       </p>
       <input type="submit" value="Kirjaudu" />
     </form>
