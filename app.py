@@ -136,8 +136,9 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session.pop("user_id", None)
-    session.pop("username", None)
+    if "user_id" in session:
+        session.pop("user_id", None)
+        session.pop("username", None)
     return redirect("/")
 
 @app.route("/item/<int:item_id>/edit", methods=["GET", "POST"])

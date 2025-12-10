@@ -7,19 +7,24 @@
 
 <body>
   <h1>Urakat</h1>
-  {% if session.username %}
-  <p>
-    Olet kirjautunut nimellä {{ session.username }}, id-numerosi on {{ session.user_id }}
-  </p> 
-  {% endif %}
-  <p>
-    <a href="/login">Kirjaudu sisään</a>
-    <a href="/register">Luo tunnus</a>
-    <a href="/logout">Kirjaudu ulos</a>
-  </p>
-  <p>
-    <a href="/new_item">Luo urakka ilmoitus</a>
-  </p>
+  {% if session.get('username') %}
+<p>
+  Olet kirjautunut nimellä {{ session['username'] }}, id-numerosi on {{ session['user_id'] }}
+</p> 
+<p>
+  <a href="/logout">Kirjaudu ulos</a>
+</p>
+<p>
+  <a href="/new_item">Luo urakka ilmoitus</a>
+</p>
+
+{% else %}
+<p>
+  <a href="/login">Kirjaudu sisään</a>
+  <a href="/register">Luo tunnus</a>
+</p>
+{% endif %}
+
   
   <h2>Ilmoitukset</h2>
     <!-- Search Bar -->
