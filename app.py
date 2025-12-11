@@ -42,26 +42,38 @@ def create_item():
     description = request.form.get("description", "").strip()
     start_price_raw = request.form.get("start_price", "").strip()
 
-    # Server-side validation
+    # Otsikon validointi
     if not title:
         flash("Otsikko ei voi olla tyhjä.")
         return redirect("/new_item")
-    if len(title) > 100:
-        flash("Otsikon maksimipituus on 100 merkkiä.")
+    if len(title) > 50:
+        flash("Otsikon maksimipituus on 50 merkkiä.")
         return redirect("/new_item")
+
+    # Kuvauksen validointi
     if len(description) > 2000:
         flash("Kuvauksen maksimipituus on 2000 merkkiä.")
         return redirect("/new_item")
-    try:
-        start_price = int(start_price_raw)
-        if start_price < 0:
-            raise ValueError()
-    except ValueError:
+
+    # Lähtöhinnan validointi
+    if len(start_price_raw) > 10:  # estää liian pitkät luvut
+        flash("Luvun tulee olla pienempi kuin 1000000000.")
+        return redirect("/new_item")
+    if not start_price_raw.isdigit():
         flash("Lähtöhinnan tulee olla kokonaisluku ≥ 0.")
         return redirect("/new_item")
 
+    start_price = int(start_price_raw)
+    if start_price > 1_000_000_000:
+        flash("Luvun tulee olla pienempi kuin 1000000000.")
+        return redirect("/new_item")
+
+    # Tallennus
     items.add_item(title, description, start_price, session["user_id"])
     return redirect("/")
+
+
+
 
 @app.route("/register", methods=["GET"])
 def register():
@@ -158,28 +170,40 @@ def edit_item(item_id):
         new_description = request.form.get("description", "").strip()
         new_price_raw = request.form.get("start_price", "").strip()
 
-        # Validate edits similarly to create_item
+        # Otsikon validointi
         if not new_title:
             flash("Otsikko ei voi olla tyhjä.")
             return redirect(f"/item/{item_id}/edit")
         if len(new_title) > 100:
             flash("Otsikon maksimipituus on 100 merkkiä.")
             return redirect(f"/item/{item_id}/edit")
+
+        # Kuvauksen validointi
         if len(new_description) > 2000:
             flash("Kuvauksen maksimipituus on 2000 merkkiä.")
             return redirect(f"/item/{item_id}/edit")
-        try:
-            new_price = int(new_price_raw)
-            if new_price < 0:
-                raise ValueError()
-        except ValueError:
+
+        # Lähtöhinnan validointi
+        if len(new_price_raw) > 10:  # estää liian pitkät luvut
+            flash("Luvun tulee olla pienempi kuin 1000000000.")
+            return redirect(f"/item/{item_id}/edit")
+        if not new_price_raw.isdigit():
             flash("Lähtöhinnan tulee olla kokonaisluku ≥ 0.")
             return redirect(f"/item/{item_id}/edit")
 
+        new_price = int(new_price_raw)
+        if new_price > 1_000_000_000:
+            flash("Luvun tulee olla pienempi kuin 1000000000.")
+            return redirect(f"/item/{item_id}/edit")
+
+        # Päivitä tietokantaan
         items.update_item(item_id, new_title, new_description, new_price)
+        flash("Ilmoitus päivitetty onnistuneesti.")
         return redirect(f"/item/{item_id}")
 
+    # GET-pyyntö: näytä editointilomake
     return render_template("edit_item.html", item=item)
+
 
 @app.route("/item/<int:item_id>/delete", methods=["POST"])
 def delete_item(item_id):
