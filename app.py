@@ -6,6 +6,7 @@ import db
 import config
 import items
 import re
+import users
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -17,6 +18,18 @@ def index():
     search_query = request.form.get("search_query", "") if request.method == "POST" else ""
     all_items = items.get_items(search_query)
     return render_template("index.html", items=all_items, search_query=search_query)
+
+@app.route("/user/<int:user_id>")
+def show_user(user_id):
+    user = users.get_user(user_id)
+    if not user:
+        return "VIRHE: Käyttäjää ei löydy"
+    user_items = users.get_items(user_id)
+    # Debug
+    print("DEBUG user:", dict(user))
+    print("DEBUG user_items sample:", [dict(r) for r in user_items[:3]])
+    return render_template("show_user.html", user=user, items=user_items)
+
 
 @app.route("/item/<int:item_id>")
 def show_item(item_id):
