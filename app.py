@@ -36,7 +36,11 @@ def show_item(item_id):
     item = items.get_item(item_id)
     if not item:
         return "VIRHE: Ilmoitusta ei löydy"
-    return render_template("show_item.html", item=item)
+    classes = items.get_classes(item_id)
+    # Optional debug
+    print("DEBUG classes:", [dict(r) for r in classes])
+    return render_template("show_item.html", item=item, classes=classes)
+
 
 @app.route("/new_item")
 def new_item():
@@ -80,13 +84,15 @@ def create_item():
     if start_price > 1_000_000_000:
         flash("Luvun tulee olla pienempi kuin 1000000000.")
         return redirect("/new_item")
-
+    
+    classes = []
+    category = request.form["category"]
+    if category:
+        classes.append(("Kategoria", category))
+    
     # Tallennus
-    items.add_item(title, description, start_price, session["user_id"])
+    items.add_item(title, description, start_price, session["user_id"], classes)
     return redirect("/")
-
-
-
 
 @app.route("/register", methods=["GET"])
 def register():
