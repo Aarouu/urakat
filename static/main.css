@@ -1,0 +1,214 @@
+/* Perusrunko */
+:root {
+  --bg: #82bd92;
+  --text: #102015;
+  --muted: #2a4a35;
+  --card: #ffffff;
+  --link: #0b5ed7;
+  --link-hover: #094db3;
+  --border: #cfe6d6;
+  --flash-bg: #fff3cd;
+  --flash-border: #ffec99;
+  --flash-text: #8a6d3b;
+  --danger: #c00;
+  --danger-text: #fff;
+  --button-bg: #0b5ed7;
+  --button-text: #fff;
+  --button-hover: #094db3;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 50em;
+  padding: 1.5rem 1rem 3rem;
+  font-family: "Comic Sans MS", "Comic Sans", "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* Yhtenäinen asettelu linkkitykselle headissa olevalle <link rel="stylesheet"> */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Otsikot */
+h1, h2, h3 {
+  color: var(--muted);
+  margin: 0.6rem 0 0.4rem;
+}
+
+h1 { font-size: 1.9rem; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.2rem; }
+
+/* Linkit */
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
+/* Perus kappaleet ja kontit */
+p {
+  margin: 0.6rem 0;
+}
+
+/* Listat ilman turhaa sisennystä */
+ul, ol {
+  margin: 0.4rem 0 0.8rem;
+  padding-left: 1rem; /* maltillinen sisennys */
+}
+ul.flat, .flat-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+/* Lomakkeet */
+form {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+textarea,
+select {
+  width: 100%;
+  max-width: 28rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  color: var(--text);
+  background: #fff;
+}
+
+textarea {
+  min-height: 10rem;
+  resize: vertical;
+}
+
+input[type="submit"],
+button,
+.button {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+input[type="submit"]:hover,
+button:hover,
+.button:hover {
+  background: var(--button-hover);
+}
+
+/* Varoitus-/poistonappi */
+button.danger,
+.button-danger {
+  background: var(--danger);
+  color: var(--danger-text);
+}
+button.danger:hover,
+.button-danger:hover {
+  filter: brightness(0.9);
+}
+
+/* Pienet “kortit” listauksille (valinnainen tyyli) */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+/* Flash-viestit */
+.flashes, .flash {
+  margin: 0.8rem 0;
+}
+.flash {
+  background: var(--flash-bg);
+  border: 1px solid var(--flash-border);
+  color: var(--flash-text);
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+}
+.flash.success {
+  background: #d1e7dd;
+  border-color: #badbcc;
+  color: #0f5132;
+}
+.flash.error {
+  background: #f8d7da;
+  border-color: #f5c2c7;
+  color: #842029;
+}
+
+/* Ylä-/alasuuntaiset linkkipainikkeet, esim. “Takaisin etusivulle” */
+a.button-link {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  background: var(--button-bg);
+  color: var(--button-text);
+}
+a.button-link:hover {
+  background: var(--button-hover);
+}
+
+/* Taulukot (jos käytät) */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8rem 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+th, td {
+  padding: 0.6rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+th {
+  color: var(--muted);
+}
+
+/* Pienet apuluokat */
+.m-0 { margin: 0 !important; }
+.mt-1 { margin-top: 0.5rem !important; }
+.mb-1 { margin-bottom: 0.5rem !important; }
+.mt-2 { margin-top: 1rem !important; }
+.mb-2 { margin-bottom: 1rem !important; }
+.center { text-align: center; }
+.right { text-align: right; }
+
+/* Poisto- ja varmistuslomakkeet inline-tyylissä listassa */
+form.inline {
+  display: inline;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+
+

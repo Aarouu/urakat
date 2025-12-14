@@ -4,6 +4,7 @@
   <title>{{ item["title"] }}</title>
 </head>
 <body>
+  <link rel="stylesheet" href="/static/main.css">
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       <div class="flashes">
@@ -67,7 +68,7 @@
         {{ offer["price"] }} €,
         <a href="/user/{{ offer['user_id'] }}">{{ offer["username"] }}</a>
         {% if session.username == offer["username"] %}
-          <form action="/offer/{{ offer['offer_id'] }}/delete" method="post" style="display:inline;">
+          <form action="/offer/{{ offer['offer_id'] }}/delete" method="post" class="inline">
             <button type="submit">Poista</button>
           </form>
         {% endif %}
