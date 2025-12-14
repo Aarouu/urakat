@@ -28,6 +28,7 @@
       Lähtöhinta: <br />
       <input type="text" name="start_price" size="6" value="{{ item.start_price }}" /> €
     </p>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Tallenna muutokset" />
   </form>
 
@@ -35,6 +36,7 @@
   {% if session.get('user_id') and session.get('user_id') == item.user_id %}
   <hr />
   <form action="/item/{{ item.id }}/delete" method="post" onsubmit="return confirm('Haluatko varmasti poistaa tämän ilmoituksen? Tätä toimintoa ei voi peruuttaa.');">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <button type="submit" style="background-color:#c00;color:#fff;border:none;padding:8px 12px;cursor:pointer;">
       Poista ilmoitus
     </button>

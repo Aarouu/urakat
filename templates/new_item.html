@@ -35,12 +35,14 @@
         <option value="Purku">Purku</option>
         <option value="Pihatyöt">Pihatyöt</option>
         <option value="Suunnittelu">Suunnittelu</option>
+        <option value="Muut">Muut</option>
       </select>
     </p>
     <p>
         Lähtöhinta: <br />
         <input type="text" name="start_price" size="6" /> €
     </p>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Luo ilmoitus" />
   </form>
 </body>

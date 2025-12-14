@@ -7,11 +7,19 @@ import config
 import items
 import re
 import users
+import secrets
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
 
 USERNAME_RE = re.compile(r"^[A-Za-z0-9_-]{3,30}$")
+
+def check_csrf():
+    if "csrf_token" not in request.form:
+        abort(403)
+    if request.form["csrf_token"] != session["csrf_token"]:
+        abort(403)
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -56,7 +64,7 @@ def new_item():
 def create_item():
     if "user_id" not in session:
         return redirect("/login")
-
+    check_csrf()
     title = request.form.get("title", "").strip()
     description = request.form.get("description", "").strip()
     start_price_raw = request.form.get("start_price", "").strip()
@@ -101,7 +109,7 @@ def create_offer():
     if "user_id" not in session:
         flash("Kirjaudu sisään tehdäksesi tarjouksen.")
         return redirect("/login")
-
+    check_csrf()
     price_raw = request.form.get("price", "").strip()
     item_id_raw = request.form.get("item_id", "").strip()
 
@@ -142,6 +150,7 @@ def create_offer():
 def delete_offer(offer_id):
     if "user_id" not in session:
         return redirect("/login")
+    check_csrf()
     user_id = session["user_id"]
 
     # Hae item_id ensin
@@ -224,6 +233,7 @@ def login():
     if check_password_hash(password_hash, password):
         session["user_id"] = user_id
         session["username"] = username
+        session["csrf_token"] = secrets.token_hex(16)
         return redirect("/")
     else:
         flash("VIRHE: väärä tunnus tai salasana")
@@ -249,6 +259,7 @@ def edit_item(item_id):
         return "VIRHE: Sinulla ei ole oikeuksia muokata tätä ilmoitusta"
 
     if request.method == "POST":
+        check_csrf()
         new_title = request.form.get("title", "").strip()
         new_description = request.form.get("description", "").strip()
         new_price_raw = request.form.get("start_price", "").strip()
@@ -292,7 +303,7 @@ def edit_item(item_id):
 def delete_item(item_id):
     if "user_id" not in session:
         return redirect("/login")
-
+    check_csrf()
     item = items.get_item(item_id)
     if not item:
         flash("VIRHE: Ilmoitusta ei löydy")

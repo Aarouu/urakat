@@ -75,6 +75,8 @@ def update_item(item_id, title, description, start_price):
     db.execute(sql, [title, description, start_price, item_id])
 
 def delete_item(item_id):
-    sql = "DELETE FROM items WHERE id = ?"
-    db.execute(sql, [item_id])
+    # Delete dependent rows first to satisfy FK constraints
+    db.execute("DELETE FROM offers WHERE item_id = ?", [item_id])
+    db.execute("DELETE FROM item_classes WHERE item_id = ?", [item_id])
+    db.execute("DELETE FROM items WHERE id = ?", [item_id])
 

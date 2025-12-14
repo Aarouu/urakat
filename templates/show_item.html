@@ -49,6 +49,7 @@
       required
     /> €
     <input type="hidden" name="item_id" value="{{ item['id'] }}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Tarjoa" />
   </form>
 
@@ -69,6 +70,7 @@
         <a href="/user/{{ offer['user_id'] }}">{{ offer["username"] }}</a>
         {% if session.username == offer["username"] %}
           <form action="/offer/{{ offer['offer_id'] }}/delete" method="post" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
             <button type="submit">Poista</button>
           </form>
         {% endif %}
