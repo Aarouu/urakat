@@ -10,10 +10,36 @@ def add_item(title, description, start_price, user_id, classes):
     for title, value in classes:
         db.execute(sql, [item_id, title, value])
 
+def add_offer(item_id, user_id, price):
+    sql = """INSERT INTO offers (item_id, user_id, price) 
+             VALUES (?, ?, ?)"""
+    db.execute(sql, [item_id, user_id, price])
+
+def get_offers(item_id):
+    sql = """
+        SELECT o.id AS offer_id, o.price, u.id AS user_id, u.username
+        FROM offers o
+        JOIN users u ON o.user_id = u.id
+        WHERE o.item_id = ?
+        ORDER BY o.id DESC
+    """
+    return db.query(sql, [item_id])
+
+def delete_offer(offer_id, user_id):
+    # Poista vain jos tarjous kuuluu tälle käyttäjälle
+    sql = "DELETE FROM offers WHERE id = ? AND user_id = ?"
+    db.execute(sql, [offer_id, user_id])
+
+
 def get_classes(item_id):
     sql = "SELECT title, value FROM item_classes WHERE item_id = ?"
     return db.query(sql, [item_id])
 
+def get_best_price(item_id):
+    # Palauta alin voimassa oleva tarjous, jos on, muuten None
+    sql = "SELECT MIN(price) AS min_price FROM offers WHERE item_id = ?"
+    rows = db.query(sql, [item_id])
+    return rows[0]["min_price"] if rows and rows[0]["min_price"] is not None else None
 
 def get_items(search_query=None):
     # Return all items, newest first, filtered by search query

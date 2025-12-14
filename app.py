@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask
-from flask import redirect, render_template, request, session, flash
+from flask import redirect, render_template, request, session, flash, abort
 from werkzeug.security import check_password_hash, generate_password_hash
 import db
 import config
@@ -37,9 +37,11 @@ def show_item(item_id):
     if not item:
         return "VIRHE: Ilmoitusta ei löydy"
     classes = items.get_classes(item_id)
-    # Optional debug
-    print("DEBUG classes:", [dict(r) for r in classes])
-    return render_template("show_item.html", item=item, classes=classes)
+    offers = items.get_offers(item_id)
+    best = items.get_best_price(item_id)  # vain offersista
+    return render_template("show_item.html", item=item, classes=classes, offers=offers, best_price=best)
+
+
 
 
 @app.route("/new_item")
@@ -93,6 +95,68 @@ def create_item():
     # Tallennus
     items.add_item(title, description, start_price, session["user_id"], classes)
     return redirect("/")
+
+@app.route("/create_offer", methods=["POST"])
+def create_offer():
+    if "user_id" not in session:
+        flash("Kirjaudu sisään tehdäksesi tarjouksen.")
+        return redirect("/login")
+
+    price_raw = request.form.get("price", "").strip()
+    item_id_raw = request.form.get("item_id", "").strip()
+
+    # Perusvalidoinnit (pidä samat kuin muualla)
+    if not item_id_raw.isdigit():
+        return redirect("/")
+    item_id = int(item_id_raw)
+
+    if len(price_raw) > 10 or not price_raw.isdigit():
+        flash("Tarjouksen tulee olla kokonaisluku (enintään 10 numeroa).")
+        return redirect(f"/item/{item_id}")
+
+    price = int(price_raw)
+    if price <= 0 or price > 1_000_000_000:
+        flash("Tarjouksen tulee olla välillä 1–1000000000.")
+        return redirect(f"/item/{item_id}")
+
+    # Kohde olemassa?
+    item = items.get_item(item_id)
+    if not item:
+        return redirect("/")
+
+    # Hae paras (alin) tarjous vain offers-taulusta
+    best = items.get_best_price(item_id)
+
+    # Jos tarjouksia on, uuden pitää olla parempi (pienempi)
+    if best is not None and price >= best:
+        flash(f"Tarjous on liian suuri. Nykyinen alin tarjous: {best} €.")
+        return redirect(f"/item/{item_id}")
+
+    # OK, tallenna
+    user_id = session["user_id"]
+    items.add_offer(item_id, user_id, price)
+    flash("Tarjous lisätty.")
+    return redirect(f"/item/{item_id}")
+
+@app.route("/offer/<int:offer_id>/delete", methods=["POST"])
+def delete_offer(offer_id):
+    if "user_id" not in session:
+        return redirect("/login")
+    user_id = session["user_id"]
+
+    # Hae item_id ensin
+    rows = db.query("SELECT item_id FROM offers WHERE id = ? AND user_id = ?", [offer_id, user_id])
+    if not rows:
+        flash("VIRHE: Et voi poistaa tätä tarjousta.")
+        return redirect("/")
+
+    item_id = rows[0]["item_id"]
+
+    # Poisto
+    items.delete_offer(offer_id, user_id)
+    flash("Tarjous poistettu.")
+    return redirect(f"/item/{item_id}")
+
 
 @app.route("/register", methods=["GET"])
 def register():

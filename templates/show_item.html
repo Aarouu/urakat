@@ -4,6 +4,20 @@
   <title>{{ item["title"] }}</title>
 </head>
 <body>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flashes">
+        {% for message in messages %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  <p>
+    <a href="/" style="display:inline-block; padding:8px 12px; background-color:#007bff; color:#fff; text-decoration:none; border-radius:4px;">
+      Takaisin etusivulle
+    </a>
+  </p>
   <h1>{{ item["title"] }}</h1>
 
   <p>{{ item["description"] }}</p>
@@ -23,15 +37,43 @@
   <p>
     Ilmoittaja: <a href="/user/{{ item["user_id"] }}">{{ item["username"] }}</a>
   </p>
+  <h2>Uusi tarjous</h2>
+  <form action="/create_offer" method="post">
+    Millä hinnalla sitoudut toteuttamaan urakan?:
+    <input
+      type="text"
+      name="price"
+      size="8"
+      pattern="[1-9][0-9]{0,9}"
+      required
+    /> €
+    <input type="hidden" name="item_id" value="{{ item['id'] }}">
+    <input type="submit" value="Tarjoa" />
+  </form>
+
+  {% if best_price is not none %}
+    <p>Nykyinen alin tarjous: {{ best_price }} €</p>
+  {% else %}
+    <p>Ei vielä tarjouksia.</p>
+  {% endif %}
 
   {% if session.username == item["username"] %}
     <p><a href="/item/{{ item["id"] }}/edit">Muokkaa ilmoitusta</a></p>
   {% endif %}
+  <h2>Tarjoukset</h2>
+  <ul>
+    {% for offer in offers %}
+      <li>
+        {{ offer["price"] }} €,
+        <a href="/user/{{ offer['user_id'] }}">{{ offer["username"] }}</a>
+        {% if session.username == offer["username"] %}
+          <form action="/offer/{{ offer['offer_id'] }}/delete" method="post" style="display:inline;">
+            <button type="submit">Poista</button>
+          </form>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
 
-  <p>
-    <a href="/" style="display:inline-block; padding:8px 12px; background-color:#007bff; color:#fff; text-decoration:none; border-radius:4px;">
-      Takaisin etusivulle
-    </a>
-  </p>
 </body>
 </html>
